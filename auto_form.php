@@ -1,14 +1,20 @@
-<?php
-function readAutoArray() : array
+<?php //Wurde aus jeder einzelnen Funktion herausgelöst und als eine für alle anderen funktionen benutzbare Funktion
+// erstellt, um eine Datenbankverbindung (PDO -Objekt) zu erhalten bzw. zurückzugeben.
+function getDBConnection(): PDO
 {
     // Das Objekt benoetigt den der Ort der DBMS, den DBname, Username, Passwort.
     $servername = "127.0.0.1";
     $username = "root";
     $password = "";
     $dbname = "auto_240617";
-
     // Erstellen ein Objekt der Klasse PDO
-    $dbcon = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    return new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+}
+
+function readAutoArray(): array
+{
+    //$dbcon = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password); //Alte Methode
+    $dbcon = getDBConnection();
 
     $stmt_read = "Select * from auto"; // Unsere "Normale" (all) abfrage an die Datenbank
 
@@ -21,6 +27,23 @@ function readAutoArray() : array
     //Geben unsere Variable (in dem Fall ein Assoziatives Array) zurück
     return $result;
 }
+
+function readColorArray(): array
+{
+    $dbcon = getDBConnection();
+
+    $stmt_read = "Select * from color"; // Unsere "Normale" (all) abfrage an die Datenbank
+
+    // Erstellen ein PDOStatment Objekt und teilen es mit einen SQL Befehl an die Datenbank zu senden
+    $request = $dbcon->prepare($stmt_read);
+    // Schicke den Befehl ab
+    $request->execute();
+    // Wir holen uns die Antwort
+    $result = $request->fetchAll(PDO::FETCH_ASSOC);
+    //Geben unsere Variable (in dem Fall ein Assoziatives Array) zurück
+    return $result;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -39,6 +62,7 @@ function readAutoArray() : array
             height: 100vh;
             margin: 0;
         }
+
         .container {
             background: white;
             padding: 20px;
@@ -46,14 +70,17 @@ function readAutoArray() : array
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 300px;
         }
+
         h2 {
             text-align: center;
         }
+
         label {
             font-weight: bold;
             display: block;
             margin-top: 10px;
         }
+
         input, select {
             width: 90%;
             max-width: 250px;
@@ -62,10 +89,12 @@ function readAutoArray() : array
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
         .checkbox-group, .radio-group {
             display: flex;
             flex-direction: column;
         }
+
         .submit-btn {
             width: 100%;
             background: #28a745;
@@ -77,6 +106,7 @@ function readAutoArray() : array
             border-radius: 5px;
             font-size: 16px;
         }
+
         .submit-btn:hover {
             background: #218838;
         }
@@ -92,12 +122,17 @@ function readAutoArray() : array
         <label for="lname">Nachname:</label>
         <input id="lname" type="text" name="lname" required>
 
-        <label>Farbe:</label>
-        <div class="radio-group">
-            <input id="red" type="radio" name="color" value="red"> <label for="red">Rot</label>
-            <input id="green" type="radio" name="color" value="green"> <label for="green">Grün</label>
-            <input id="blue" type="radio" name="color" value="blue"> <label for="blue">Blau</label>
-        </div>
+        <label for="colors">Farbe:</label>
+        <select id="colors" name="color">
+            <?php
+            $farbenarray = readColorArray(); // liest die tabelle farbe (color) aus und gibt uns ein farbarray zurück
+
+            foreach ($farbenarray as $color) {
+                echo "<option style = background-color:{$color['hexcode']} value = {$color['hexcode']}>{$color['name']}</option>";
+                //erstellt je nach menge in der Datenbank optionen für die Farbauswahl in unserem Drop-Down Menu
+            }
+            ?>
+        </select>
 
         <label>Extras:</label>
         <div class="checkbox-group">
@@ -109,12 +144,12 @@ function readAutoArray() : array
         <label for="marke">Marke:</label>
         <select id="marke" name="marke">
             <?php
-            $markenarray = readAutoArray();
+            $markenarray = readAutoArray(); // liest die tabelle Auto aus und gibt uns ein Assoziatives array mit den Daten der Autos zurück
 
-            for ($i = 0; $i < count($markenarray); $i++){
-                echo "<option value='" . $markenarray[$i]["hersteller"] . "'>" . $markenarray[$i]["hersteller"] . "</option>";
-
-
+            for ($i = 0; $i < count($markenarray); $i++) {
+                //echo "<option value='" . $markenarray[$i]["hersteller"] . "'>" . $markenarray[$i]["hersteller"] . "</option>";
+                echo "<option value='{$markenarray[$i]['hersteller']}'>{$markenarray[$i]['hersteller']}</option>";
+                //Generiert hier per for-loop ein DropDownmenu, sortiert bzw. selektiert nach HerstellerName
             }
             ?>
         </select>
