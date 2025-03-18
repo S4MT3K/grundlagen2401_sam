@@ -1,3 +1,28 @@
+<?php
+function readAutoArray() : array
+{
+    // Das Objekt benoetigt den der Ort der DBMS, den DBname, Username, Passwort.
+    $servername = "127.0.0.1";
+    $username = "root";
+    $password = "";
+    $dbname = "auto_240617";
+
+    // Erstellen ein Objekt der Klasse PDO
+    $dbcon = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+
+    $stmt_read = "Select * from auto"; // Unsere "Normale" (all) abfrage an die Datenbank
+
+    // Erstellen ein PDOStatment Objekt und teilen es mit einen SQL Befehl an die Datenbank zu senden
+    $request = $dbcon->prepare($stmt_read);
+    // Schicke den Befehl ab
+    $request->execute();
+    // Wir holen uns die Antwort
+    $result = $request->fetchAll(PDO::FETCH_ASSOC);
+    //Geben unsere Variable (in dem Fall ein Assoziatives Array) zurück
+    return $result;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -83,10 +108,15 @@
 
         <label for="marke">Marke:</label>
         <select id="marke" name="marke">
-            <option value="bmw">BMW</option>
-            <option value="volvo">Volvo</option>
-            <option value="vw">VW</option>
-            <option value="seat">Seat</option>
+            <?php
+            $markenarray = readAutoArray();
+
+            for ($i = 0; $i < count($markenarray); $i++){
+                echo "<option value='" . $markenarray[$i]["hersteller"] . "'>" . $markenarray[$i]["hersteller"] . "</option>";
+
+
+            }
+            ?>
         </select>
 
         <button type="submit" class="submit-btn">Bestellen</button>

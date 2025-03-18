@@ -4,6 +4,7 @@ $lname = $_GET['lname'] ?? '';
 $color = $_GET['color'] ?? 'white';
 $aus_array = $_GET['aus'] ?? [];
 $marke = $_GET['marke'] ?? 'Unbekannt';
+
 ?>
 
 <!DOCTYPE html>
