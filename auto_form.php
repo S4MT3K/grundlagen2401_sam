@@ -7,11 +7,11 @@ function getDBConnection(): PDO
     $username = "root";
     $password = "";
     $dbname = "auto_240617";
-    // Erstellen ein Objekt der Klasse PDO
+    // gibt ein Objekt der Klasse PDO zurück
     return new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
 }
 
-function readAutoArray(): array
+function readAutoArray(): array //veraltete version des returns (zum nachlesen)
 {
     //$dbcon = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password); //Alte Methode
     $dbcon = getDBConnection();
@@ -28,7 +28,7 @@ function readAutoArray(): array
     return $result;
 }
 
-function readColorArray(): array
+function readColorArray(): array //neuere variante (inline return)
 {
     $dbcon = getDBConnection();
 
@@ -39,11 +39,9 @@ function readColorArray(): array
     // Schicke den Befehl ab
     $request->execute();
     // Wir holen uns die Antwort
-    $result = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $request->fetchAll(PDO::FETCH_ASSOC);
     //Geben unsere Variable (in dem Fall ein Assoziatives Array) zurück
-    return $result;
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -129,7 +127,8 @@ function readColorArray(): array
 
             foreach ($farbenarray as $color) {
                 echo "<option style = background-color:{$color['hexcode']} value = {$color['hexcode']}>{$color['name']}</option>";
-                //erstellt je nach menge in der Datenbank optionen für die Farbauswahl in unserem Drop-Down Menu
+                //erstellt je nach menge in der Datenbank optionen für die Farbauswahl in unserem Drop-Down Menu und färbt die auswahl
+                //im hintergrund entsprechend der farbe ein (inline css)
             }
             ?>
         </select>
@@ -150,6 +149,8 @@ function readColorArray(): array
                 //echo "<option value='" . $markenarray[$i]["hersteller"] . "'>" . $markenarray[$i]["hersteller"] . "</option>";
                 echo "<option value='{$markenarray[$i]['hersteller']}'>{$markenarray[$i]['hersteller']}</option>";
                 //Generiert hier per for-loop ein DropDownmenu, sortiert bzw. selektiert nach HerstellerName
+
+                // NOTE: Die {}-Klammern im HTML-Teil (innerhalb von PHP) ermöglichen die direkte Ausgabe von PHP-Variablen.
             }
             ?>
         </select>
