@@ -90,3 +90,18 @@ INSERT INTO colors (name, hexcode) VALUES
                                        ('Eisblau', '#A4D3E7'),
                                        ('Zartrosa', '#FFB6C1');
 
+
+CREATE TABLE bestellungen (
+                              bestellId int auto_increment PRIMARY KEY ,
+                              vorname varchar(50),
+                              nachname varchar(50),
+                              farbcode varchar(10)
+);
+
+CREATE TABLE extrasBestellung (
+                                bestellId int (2),
+                                extrasId int (2),
+                                PRIMARY KEY (bestellId,extrasId),
+                                foreign key (bestellId) REFERENCES bestellungen(bestellId),
+                                foreign key (extrasId) REFERENCES  extras(id)
+);

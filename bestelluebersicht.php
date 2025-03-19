@@ -1,10 +1,54 @@
 <?php
-$fname = $_GET['fname'] ?? 'Joe';
-$lname = $_GET['lname'] ?? '';
-$color = $_GET['color'] ?? 'white';
-$optionsArray = $_GET['options'] ?? ['SIE', 'HABEN', 'NICHTS', 'AUSGEWÄHLT'];
-$marke = $_GET['marke'] ?? 'Unbekannt';
+$fname = $_GET['fname'] ?? 'John';
+$lname = $_GET['lname'] ?? 'Dorian';
+$color = $_GET['color'] ?? 'Black';
+$optionsArray = $_GET['options'] ?? ['ABS', 'Sportsitze', 'Lichtpaket', '19" Chrom Felgen'];
+$marke = $_GET['marke'] ?? 'Seat';
 
+$bestelltext = "";
+
+function getDBConnection(): PDO
+{
+    // Das Objekt benoetigt den der Ort der DBMS, den DBname, Username, Passwort.
+    $servername = "127.0.0.1";
+    $username = "root";
+    $password = "";
+    $dbname = "auto_240617";
+    // gibt ein Objekt der Klasse PDO zurück
+    return new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+}
+
+function createBestellEintrag(string $thename, string $theother, string $thecolor) : void
+{
+    //holen unserer Datenbank Verbindung
+    $dbcon = getDBConnection();
+
+    // Erstellen ein PDOStatment Objekt und teilen es mit einen SQL Befehl an die Datenbank zu senden
+    $stmt_create = "INSERT INTO bestellungen (vorname, nachname, farbcode) VALUES (:fname, :lname, :fcode)"; // Unsere "Normale" (all) abfrage an die Datenbank
+
+    //Vorbereitung unseres SQL-Befehls
+    $request = $dbcon->prepare($stmt_create);
+
+    //nachfolgend werden unsere parameter "überprüft" und gebunden, sodass sie sicher an die Datenbank gesendet werden können!
+    $request->bindParam(":fname", $thename, 2);
+    $request->bindParam(":lname", $theother, 2);
+    $request->bindParam(":fcode", $thecolor, 2);
+
+    //Inline bzw. kompakte möglichkeit es direkt im Execute zu binden und auszuführen!
+    //$request->execute([    ':fname' => $fname,    ':lname' => $lname,    ':color' => $color,    ':brand' => $marke]);
+
+    // Schicke den Befehl ab
+    $request->execute();
+}
+
+//Wenn Server GET Request erhält und die bestellt variable in der GET-Variable Vorhanden, dann:
+if ($_SERVER["REQUEST_METHOD"] == "GET" && isset ($_GET["bestellt"]))
+{
+    //zeigt eine Meldung, die die Bestellung bestätigt.
+    $bestelltext = "<p> AUTO ERFOLGREICH BESTELLT </p>";
+    //Bestellung in Datenbank Schreiben
+    createBestellEintrag($fname, $lname, $color);
+}
 ?>
 
 <!DOCTYPE html>
@@ -47,6 +91,10 @@ $marke = $_GET['marke'] ?? 'Unbekannt';
             border: 1px solid #000;
             display: inline-block;
         }
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -80,6 +128,14 @@ $marke = $_GET['marke'] ?? 'Unbekannt';
             <?php endforeach; ?>
         <?php endif; ?>
     </table>
+    <div class="button-container">
+        <form method="get">
+            <input type="hidden" name="bestellt" value="1">
+            <button type="submit">Bestellen</button>
+        </form>
+        <?php echo $bestelltext ?>
+    </div>
 </div>
+
 </body>
 </html>
