@@ -2,7 +2,7 @@
 $fname = $_GET['fname'] ?? 'Joe';
 $lname = $_GET['lname'] ?? '';
 $color = $_GET['color'] ?? 'white';
-$aus_array = $_GET['aus'] ?? [];
+$optionsArray = $_GET['options'] ?? ['SIE', 'HABEN', 'NICHTS', 'AUSGEWÄHLT'];
 $marke = $_GET['marke'] ?? 'Unbekannt';
 
 ?>
@@ -69,13 +69,13 @@ $marke = $_GET['marke'] ?? 'Unbekannt';
             <td><?php echo htmlspecialchars($color); ?></td>
             <td><span class="color-box"></span></td>
         </tr>
-        <?php if (!empty($aus_array)): ?>
+        <?php if (!empty($optionsArray)): ?>
             <tr>
                 <th colspan="2">Extras</th>
             </tr>
-            <?php foreach ($aus_array as $aus): ?>
+            <?php foreach ($optionsArray as $option): ?>
                 <tr>
-                    <td colspan="2"><?php echo htmlspecialchars($aus); ?></td>
+                    <td colspan="2"><?php echo htmlspecialchars($option); ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php endif; ?>

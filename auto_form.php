@@ -32,7 +32,7 @@ function readColorArray(): array //neuere variante (inline return)
 {
     $dbcon = getDBConnection();
 
-    $stmt_read = "Select * from color"; // Unsere "Normale" (all) abfrage an die Datenbank
+    $stmt_read = "Select * from colors"; // Unsere "Normale" (all) abfrage an die Datenbank
 
     // Erstellen ein PDOStatment Objekt und teilen es mit einen SQL Befehl an die Datenbank zu senden
     $request = $dbcon->prepare($stmt_read);
@@ -41,6 +41,17 @@ function readColorArray(): array //neuere variante (inline return)
     // Wir holen uns die Antwort
     return $request->fetchAll(PDO::FETCH_ASSOC);
     //Geben unsere Variable (in dem Fall ein Assoziatives Array) zurück
+}
+
+function readExtraArray(): array
+{
+    $dbcon = getDBConnection();
+    $stmt_read = "SELECT * FROM extras";
+
+    $request = $dbcon->prepare($stmt_read);
+    $request->execute();
+
+    return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
 
@@ -113,7 +124,7 @@ function readColorArray(): array //neuere variante (inline return)
 <body>
 <div class="container">
     <h2>Auto kaufen</h2>
-    <form action="auto_beamter.php" method="get">
+    <form action="bestelluebersicht.php" method="get">
         <label for="fname">Vorname:</label>
         <input id="fname" type="text" name="fname" required>
 
@@ -134,11 +145,17 @@ function readColorArray(): array //neuere variante (inline return)
         </select>
 
         <label>Extras:</label>
-        <div class="checkbox-group">
-            <input id="aus_1" type="checkbox" name="aus[]" value="abs"> <label for="aus_1">ABS</label>
-            <input id="aus_2" type="checkbox" name="aus[]" value="klima"> <label for="aus_2">Klima</label>
-            <input id="aus_3" type="checkbox" name="aus[]" value="airbag"> <label for="aus_3">Airbag</label>
-        </div>
+       <select name="options[]" multiple="multiple" size="5">
+           <?php
+           $extrasarray = readExtraArray();
+
+           foreach ($extrasarray as $extra)
+           {
+               echo "<option value='{$extra['name']}'>{$extra['name']}</option>";
+           }
+           ?>
+
+       </select>
 
         <label for="marke">Marke:</label>
         <select id="marke" name="marke">
